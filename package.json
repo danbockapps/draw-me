@@ -13,6 +13,8 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "3.3.1",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.88.2",
     "typescript": "^3.7.5"
   },
   "scripts": {
@@ -35,5 +37,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "husky": "^4.2.1",
+    "lint-staged": "^10.0.7",
+    "prettier": "^1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,css,md}": "prettier --write"
   }
 }
