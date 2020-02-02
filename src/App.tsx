@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "semantic-ui-css/semantic.min.css";
+import { Button, Container, Header, Segment } from "semantic-ui-react";
 
 const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container style={{ marginTop: "2em" }}>
+      <Header as="h1" inverted textAlign="center">
+        Draw Me
+      </Header>
+
+      <Segment inverted textAlign="center">
+        <p>Upload a picture (all uploads will be posted publicly).</p>
+      </Segment>
+
+      <Segment inverted textAlign="center">
+        <Button inverted color="yellow" size="massive">
+          Select Image...
+        </Button>
+      </Segment>
+    </Container>
   );
-}
+};
 
 export default App;
