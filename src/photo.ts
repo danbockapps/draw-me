@@ -37,7 +37,7 @@ export const sendRequest = (url: string) =>
     })
 
 const pollForImageUrl = async (requestId: string) => {
-  let triesRemaining: number = 10
+  let triesRemaining: number = 20
   while (triesRemaining) {
     const response: AxiosResponse<any> = await axios.get(
       getImageInfoUrl(requestId),
@@ -51,6 +51,7 @@ const pollForImageUrl = async (requestId: string) => {
       await new Promise(r => setTimeout(r, 1000))
     }
   }
+  alert('There was an error processing the image.')
 }
 
 export const getImageInfoUrl = (id: string) =>

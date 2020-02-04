@@ -8,10 +8,12 @@ import { sendRequest } from './photo'
 const App = () => {
   const [origImage, setOrigImage] = useState<string>()
   const [modImage, setModImage] = useState<string>()
+  const [loading, setLoading] = useState<boolean>()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fileChange = (fl: FileList | null) => {
     if (fl !== null) {
+      setLoading(true)
       const ref = storage
         .ref()
         .child(uuid.v4() + '.' + fl[0].name.split('.').pop()) // Random string for unique filename
@@ -25,6 +27,7 @@ const App = () => {
         })
         .then(resultUrl => resultUrl && setModImage(resultUrl))
         .catch(err => alert('An error occurred: ' + err))
+        .finally(() => setLoading(false))
     }
   }
 
@@ -44,6 +47,7 @@ const App = () => {
           color='yellow'
           size='massive'
           onClick={() => fileInputRef?.current?.click()}
+          loading={loading}
         >
           Select Image...
         </Button>
@@ -57,7 +61,7 @@ const App = () => {
         onChange={e => fileChange(e.target.files)}
       />
 
-      <Grid>
+      <Grid style={{ marginTop: '2em' }}>
         <Grid.Row columns={2}>
           <Grid.Column>
             {origImage && <img src={origImage} alt='Original' />}
