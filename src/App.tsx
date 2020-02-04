@@ -1,22 +1,24 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import 'semantic-ui-css/semantic.min.css'
-import { Button, Container, Header, Segment } from 'semantic-ui-react'
+import { Button, Container, Grid, Header, Segment } from 'semantic-ui-react'
+import uuid from 'uuid'
 import { storage } from './firebase'
 
-import uuid from 'uuid'
-
 const App = () => {
+  const [origImage, setOrigImage] = useState<string>()
+  const [modImage, setModImage] = useState<string>()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fileChange = (fl: FileList | null) => {
     if (fl !== null) {
-      storage
+      const ref = storage
         .ref()
-        .child(uuid.v4()) // Random string for unique filename
+        .child(uuid.v4() + '.' + fl[0].name.split('.').pop()) // Random string for unique filename
+
+      ref
         .put(fl[0])
-        .then(data => {
-          console.log(data)
-        })
+        .then(() => ref.getDownloadURL())
+        .then(url => setOrigImage(url))
         .catch(err => alert('An error occurred: ' + err))
     }
   }
@@ -45,9 +47,21 @@ const App = () => {
       <input
         ref={fileInputRef}
         type='file'
+        accept='image/*'
         hidden
         onChange={e => fileChange(e.target.files)}
       />
+
+      <Grid divided='vertically'>
+        <Grid.Row columns={2}>
+          <Grid.Column>
+            {origImage && <img src={origImage} alt='Original' />}
+          </Grid.Column>
+          <Grid.Column>
+            {modImage && <img src={modImage} alt='Modified' />}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     </Container>
   )
 }
