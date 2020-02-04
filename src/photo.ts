@@ -21,7 +21,7 @@ const getSignData = (url: string) =>
 export const sendRequest = (url: string) =>
   axios
     .post(
-      'http://opeapi.ws.pho.to/addtask',
+      'https://opeapi.ws.pho.to/addtask',
       querystring.encode({
         app_id: process.env.REACT_APP_PHO_TO_APP_ID,
         sign_data: getSignData(url),
