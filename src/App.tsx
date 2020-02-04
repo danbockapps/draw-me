@@ -3,6 +3,7 @@ import 'semantic-ui-css/semantic.min.css'
 import { Button, Container, Grid, Header, Segment } from 'semantic-ui-react'
 import uuid from 'uuid'
 import { storage } from './firebase'
+import { sendRequest } from './photo'
 
 const App = () => {
   const [origImage, setOrigImage] = useState<string>()
@@ -18,7 +19,11 @@ const App = () => {
       ref
         .put(fl[0])
         .then(() => ref.getDownloadURL())
-        .then(url => setOrigImage(url))
+        .then(url => {
+          setOrigImage(url)
+          return sendRequest(url)
+        })
+        .then(resultUrl => resultUrl && setModImage(resultUrl))
         .catch(err => alert('An error occurred: ' + err))
     }
   }
@@ -52,7 +57,7 @@ const App = () => {
         onChange={e => fileChange(e.target.files)}
       />
 
-      <Grid divided='vertically'>
+      <Grid>
         <Grid.Row columns={2}>
           <Grid.Column>
             {origImage && <img src={origImage} alt='Original' />}
