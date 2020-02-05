@@ -1,9 +1,21 @@
 import React, { useRef, useState } from 'react'
+import * as resizeImage from 'resize-image'
 import 'semantic-ui-css/semantic.min.css'
 import { Button, Container, Grid, Header, Segment } from 'semantic-ui-react'
 import uuid from 'uuid'
+import { dataURItoBlob } from './dataUriToBlob'
 import { storage } from './firebase'
 import { sendRequest } from './photo'
+
+const MAX_DIMENSION = 400
+
+const newImageDimensions: (img: HTMLImageElement) => [number, number] = ({
+  width,
+  height,
+}) =>
+  width > height
+    ? [MAX_DIMENSION, (height * MAX_DIMENSION) / width]
+    : [(width * MAX_DIMENSION) / height, MAX_DIMENSION]
 
 const App = () => {
   const [origImage, setOrigImage] = useState<string>()
@@ -14,20 +26,29 @@ const App = () => {
   const fileChange = (fl: FileList | null) => {
     if (fl !== null) {
       setLoading(true)
-      const ref = storage
-        .ref()
-        .child(uuid.v4() + '.' + fl[0].name.split('.').pop()) // Random string for unique filename
 
-      ref
-        .put(fl[0])
-        .then(() => ref.getDownloadURL())
-        .then(url => {
-          setOrigImage(url)
-          return sendRequest(url)
-        })
-        .then(resultUrl => resultUrl && setModImage(resultUrl))
-        .catch(err => alert('An error occurred: ' + err))
-        .finally(() => setLoading(false))
+      const img = new Image()
+
+      img.onload = function() {
+        const [width, height] = newImageDimensions(img)
+        const data = resizeImage.resize(img, width, height, resizeImage.PNG)
+        const ref = storage
+          .ref()
+          .child(uuid.v4() + '.' + fl[0].name.split('.').pop()) // Random string for unique filename
+
+        ref
+          .put(dataURItoBlob(data))
+          .then(() => ref.getDownloadURL())
+          .then(url => {
+            setOrigImage(url)
+            return sendRequest(url)
+          })
+          .then(resultUrl => resultUrl && setModImage(resultUrl))
+          .catch(err => alert('An error occurred: ' + err))
+          .finally(() => setLoading(false))
+      }
+
+      img.src = URL.createObjectURL(fl[0])
     }
   }
 
@@ -63,10 +84,10 @@ const App = () => {
 
       <Grid style={{ marginTop: '2em' }}>
         <Grid.Row columns={2}>
-          <Grid.Column>
+          <Grid.Column textAlign='center'>
             {origImage && <img src={origImage} alt='Original' />}
           </Grid.Column>
-          <Grid.Column>
+          <Grid.Column textAlign='center'>
             {modImage && <img src={modImage} alt='Modified' />}
           </Grid.Column>
         </Grid.Row>
